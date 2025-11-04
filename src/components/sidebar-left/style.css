@@ -1,0 +1,65 @@
+.sidebar-left-container {
+  margin-left: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 위/아래 로고와 메뉴 간격 조절용 */
+}
+
+.sidebar-left-container .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  font-size: 18px;
+}
+
+.sidebar-left-container div {
+    cursor: pointer;
+}
+
+.sidebar-left-container i {
+    margin-right: 10px;
+}
+
+
+.sidebar-left-container .logo {
+  font-weight: bold;
+  font-size: 25px;
+  margin-bottom: 32px;
+}
+
+.nav div:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* 아주 연한 회색 투명 배경 */
+  border-radius: 8px; /* 둥글게 */
+  cursor: pointer;   /* 마우스 커서 변경 */
+}
+
+.sidebar-left-container.compact {
+  width: 80px;  /* compact 모드에서는 너비 줄이기 */
+  padding: 20px 10px;
+}
+
+.sidebar-left-container.compact .nav {
+  align-items: center; /* compact 모드에서 아이콘 가운데 정렬 */
+  gap: 24px;
+  font-size: 20px; /* 아이콘만 조금 크게 */
+}
+
+
+.sidebar-left-container.compact i {
+  margin-right: 0; 
+}
+
+.logo-icon i {
+  font-size: 40px;
+  padding-left: 13px;
+  margin-bottom: 50px;
+}

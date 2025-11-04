@@ -1,0 +1,126 @@
+.sidebar-right-container {
+  position: flex;
+  top: 80px;
+  width: 300px;
+  font-size: 14px;
+  color: #262626;
+}
+
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-section .avatar {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.fullname {
+  color: #8e8e8e;
+  font-size: 13px;
+}
+
+.switch-btn {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #8e8e8e;
+  font-weight: 500;
+}
+
+.see-all {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #000;
+  cursor: pointer;
+}
+
+.suggestion-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-user {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.avatar.small {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.suggestion-info {
+  flex-grow: 1;
+}
+
+.note {
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.follow-btn {
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  color: #0095f6;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  border:none;
+  background: none;
+}
+
+.unFollow-btn {
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  color: gray;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  border:none;
+  background: none;
+}
+
+.sidebar-footer {
+  margin-top: 30px;
+  font-size: 11px;
+  color: #c7c7c7;
+  line-height: 1.4;
+}
+    
+
+.feed-image {
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

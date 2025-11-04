@@ -1,0 +1,94 @@
+.feed {
+  border: 1px solid #dbdbdb;
+  background: #fff;
+  margin-bottom: 20px;
+  width: 500px;
+  min-height: 600px;
+  padding-bottom: 8px;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.follow-btn {
+  margin-top: 3px;
+}
+
+.feed-header img {
+  width: 43px;
+  height: 43px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.username {
+  font-weight: bold;
+  margin-right: 7px;
+}
+
+.more-btn {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.feed-image img {
+  width: 100%;
+  display: block;
+}
+
+.feed-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.left-actions .action-btn {
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.action-btn {
+  font-size: 1.25rem;
+}
+
+.action-btn.right {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.feed-likes,
+.feed-caption,
+.feed-comments,
+.feed-timestamp {
+  padding: 0 10px;
+}
+
+.feed-likes {
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.feed-caption {
+  margin: 4px 0;
+}
+
+.view-comments {
+  color: #8e8e8e;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.feed-timestamp {
+  font-size: 10px;
+  color: #8e8e8e;
+  margin-top: 4px;
+  text-transform: uppercase;
+}

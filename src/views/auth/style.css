@@ -1,0 +1,241 @@
+/* 전체 페이지 배경 및 폰트 설정 */
+.auth-page {
+  background-color: #121212;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* 로그인 박스 */
+.auth-box {
+  background-color: #1e1e1e;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 350px;
+  text-align: center;
+  color: #f1f1f1;
+}
+
+/* 앱 타이틀 (로고처럼 사용) */
+.app-title {
+  font-size: 32px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  color: #fff;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* margin-bottom 대신 gap으로 통일 */
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-form input::placeholder {
+  color: #999;
+}
+
+.input-select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  font-size: 14px;
+  outline: none;
+}
+
+/* 주소 검색 버튼 */
+.address-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #555;
+  color: #f1f1f1;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.address-button:hover {
+  background-color: #666;
+}
+
+/* 상세주소 input */
+.detail-address {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  border: 1px solid #333;
+  font-size: 14px;
+  outline: none;
+}
+
+/* 이메일 인증 버튼 */
+.verify-button {
+  background-color: #444;
+  border: none;
+  color: #f1f1f1;
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.verify-button:hover {
+  background-color: #555;
+}
+
+/* 아이디 + 중복 확인 */
+.input-group-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-id {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+  color: #f1f1f1;
+  font-size: 14px;
+  outline: none;
+}
+
+.check-button {
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  padding: 12px;
+  height: 42px; /* input 높이와 맞춤 */
+}
+
+.check-button:hover {
+  background-color: #555;
+}
+
+.email-box {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.address-box {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+
+/* 로그인 버튼 */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3897f0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #318ae0;
+}
+
+/* 구분선 */
+.divider {
+  position: relative;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.divider span {
+  padding: 0 12px;
+  background-color: #1e1e1e;
+  color: #999;
+  font-size: 13px;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #333;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+/* 구글 로그인 버튼 */
+.google-login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 5px;
+}
+
+.google-login-button:hover {
+  background-color: #357ae8;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+
+.signup-button {
+  margin-top: 8px;
+  background: none;
+  border: 1px solid #555;
+  color: #f1f1f1;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.signup-button:hover {
+  background-color: #333;
+}

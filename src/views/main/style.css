@@ -1,0 +1,31 @@
+.main-container {
+    margin: 10px;
+    min-height: 5000px;
+}
+
+.main-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.main-top-box {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.main-bottom-box {
+    display: flex;
+    flex-direction: row;
+    margin-left: 350px;
+    gap: 50px;
+}
+
+.main-feed-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
