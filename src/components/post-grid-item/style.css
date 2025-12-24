@@ -1,0 +1,43 @@
+/* src/components/post-grid-item/style.css */
+.post-grid-item {
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 1 / 1; 
+}
+
+.post-grid-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 📌 오버레이 스타일 (좋아요, 댓글 수) */
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* 반투명 검은색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    opacity: 0; /* 기본적으로 숨김 */
+    transition: opacity 0.3s ease; /* 애니메이션 효과 */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.post-grid-item:hover .grid-overlay {
+    opacity: 1; /* 호버 시 표시 */
+}
+
+.stats-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}

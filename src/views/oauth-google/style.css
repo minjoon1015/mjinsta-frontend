@@ -1,52 +1,189 @@
+/*
+ * OauthGoogle 및 추가 정보 입력 폼 관련 스타일
+ * Auth.js의 스타일과 유사하게 통합하여 사용합니다.
+ */
+
 .oauth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: #121212;
-  color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
 }
 
+/* -------------------- 에러 박스 스타일 -------------------- */
 .error-box {
-  text-align: center;
-  background-color: #1e1e1e;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-  max-width: 350px;
-  width: 100%;
-  border: 1px solid #333;
-}
-
-.error-icon {
-  width: 60px;
-  margin-bottom: 20px;
-  filter: brightness(0) invert(1); /* 아이콘이 어두울 경우 반전 */
+    text-align: center;
+    background-color: #1e1e1e;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    max-width: 350px;
+    width: 100%;
+    border: 1px solid #333;
 }
 
 .error-box h2 {
-  color: #ff4d4d; /* 따뜻한 레드 */
-  margin-bottom: 10px;
+    color: #ff4d4d;
+    margin-bottom: 10px;
 }
 
 .error-box p {
-  font-size: 14px;
-  margin-bottom: 20px;
-  color: #aaa;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #aaa;
 }
 
 .error-box button {
-  background-color: #3897f0;
-  border: none;
-  padding: 10px 20px;
-  color: white;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    background-color: #3897f0;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .error-box button:hover {
-  background-color: #2f80ed;
+    background-color: #2f80ed;
+}
+
+/* -------------------- 추가 정보 입력 폼 (AdditionalInfoForm) 스타일 -------------------- */
+
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.auth-box {
+    background-color: #1e1e1e;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid #333;
+    margin: 20px;
+}
+
+.app-title {
+    color: #3897f0;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.sub-text {
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* 폼 요소 기본 스타일 */
+.login-form input[type="text"], 
+.login-form input[type="password"], 
+.login-form input[type="email"],
+.login-form .input-select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    font-size: 15px;
+    transition: border-color 0.3s;
+}
+
+.login-form input:focus, .login-form .input-select:focus {
+    border-color: #3897f0;
+    outline: none;
+}
+
+/* 셀렉트 박스 스타일 */
+.input-select {
+    appearance: none;
+    /* 화살표 아이콘 SVG */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23e0e0e0' d='M10 12l-6-6h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px;
+}
+
+/* 아이디 및 주소 그룹화 */
+.input-group-row, .address-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group-row input, .address-box input {
+    flex-grow: 1;
+    margin-bottom: 0 !important;
+}
+
+/* 버튼 스타일 */
+.check-button, .address-button {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.3s;
+}
+
+.check-button {
+    background-color: #3897f0;
+    color: white;
+    width: 100px;
+}
+
+.check-button:hover:not(:disabled) {
+    background-color: #2f80ed;
+}
+
+.check-button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.address-button {
+    background-color: #555;
+    color: #e0e0e0;
+    width: 100px;
+}
+
+.address-button:hover {
+    background-color: #666;
+}
+
+.detail-address {
+    margin-top: -5px;
+}
+
+/* 가입 완료 버튼 */
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #005f93;
 }

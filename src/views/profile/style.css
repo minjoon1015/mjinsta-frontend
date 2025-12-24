@@ -1,117 +1,245 @@
 .container {
-  font-family: Arial, sans-serif;
-  max-width: 900px;
-  margin-left:600px;
-  padding: 30px;
-  background-color: #fafafa;
-  min-height: 1000px;
+    font-family: Arial, sans-serif;
+    /* 최대 너비는 컨테이너 자체의 크기이며, 모달과는 별개입니다. */
+    max-width: 900px;
+    /* 중앙 정렬 또는 메인 컨텐츠 영역 시작점 조정 */
+    margin-left: 600px;
+    padding: 30px;
+    background-color: #fafafa;
+    min-height: 1000px;
+    /* PostModal이 body 레벨에 고정되므로, .container의 z-index나 overflow 문제는 없습니다. */
+}
+
+/* 📌 왼쪽 사이드바와 메인 컨텐츠 영역 분리 */
+.main-left-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
 }
 
 .profile-container {
-  margin-left: 250px;
+    /* 사이드바 영역을 비워두기 위해 margin-left 설정 */
+    margin-left: 250px;
 }
 
+/* ====================================
+   프로필 헤더 영역
+   ==================================== */
 .profile-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 100px;
-}
-
-.profile-image {
-  width: 95%;
-  height: 95%;
-  border-radius: 50%;
-  object-fit: cover;
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
 }
 
 .profile-image-box {
-  width:150px;
-  height: 150px;
-  margin-right: 80px;
-  border: 1px solid black;
-  border-radius: 150px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+    width: 150px;
+    height: 150px;
+    margin-right: 80px;
+    /* 인스타그램과 유사하게 border 제거 및 그림자/테두리 미사용 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    /* 이미지 변경 텍스트를 위한 오버레이 영역 */
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: opacity 0.3s;
 }
 
 .profile-image-text {
-  position:absolute;
-  font-size: 15px;
-  color: gray;
+    position: absolute;
+    font-size: 15px;
+    color: white;
+    /* 텍스트 색상을 흰색으로 변경 */
+    font-weight: bold;
+    opacity: 0;
+    /* 기본적으로 숨김 */
+    transition: opacity 0.3s;
+    z-index: 10;
+    text-align: center;
+}
+
+/* 호버 시 이미지 변경 오버레이 */
+.profile-image-box:hover .profile-image {
+    opacity: 0.5;
+}
+
+.profile-image-box:hover .profile-image-text {
+    opacity: 1;
 }
 
 .profile-info {
-  flex: 1;
+    flex: 1;
 }
 
 .profile-info-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .profile-info-header button {
-  width: 100px;
-  height: 32px;
-  border-radius: 8px;
-  background-color: white; /* 흰색 배경 */
-  color: #262626; /* 검정/짙은 회색 글씨 */
-  font-size: 14px;
-  margin-bottom: 14px;
-  margin-left: 30px;
-  border: 1px solid #dbdbdb; /* 연한 회색 테두리 */
-  cursor: pointer;
-  transition: all 0.2s ease; /* hover 시 부드럽게 */
+    width: 100px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: white;
+    color: #262626;
+    font-size: 14px;
+    margin-bottom: 14px;
+    margin-left: 30px;
+    border: 1px solid #dbdbdb;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .profile-username {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .profile-stats {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 10px;
-  font-size: 14px;
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    /* 폰트 크기 조정 */
+}
+
+.profile-stats strong {
+    font-weight: 600;
 }
 
 .profile-bio {
-  font-size: 14px;
-  line-height: 1.4;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .profile-bio p:first-child {
-  font-weight: bold;
+    font-weight: bold;
 }
 
+
+/* ====================================
+   게시물 그리드 (Gallery) 영역
+   ==================================== */
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+    /* 3열 그리드 */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    /* 인스타그램과 유사하게 작은 간격 */
+    border-top: 1px solid #dbdbdb;
+    /* 게시물 영역 구분선 */
+    padding-top: 40px;
 }
 
+/* PostGridItem의 스타일은 해당 컴포넌트의 CSS 파일에 있습니다. */
+/* 하지만 여기서 그리드 이미지를 정의한다면:
 .gallery img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+*/
+
+
+/* ====================================
+   모달 오버레이 (Feed 팝업) 스타일
+   ==================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.65);
+    /* 반투명 검은색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    /* 최상위 레이어로 설정 */
+    overflow-y: auto;
+    /* 화면 높이가 낮을 때 스크롤 가능 */
+    padding: 20px;
 }
 
+.modal-content {
+    position: relative;
+    /* 모달 전체 최대 너비 (Feed 좌우 분할 크기 기준) */
+    width: 90%;
+    max-width: 1200px;
+    /* 뷰포트 높이에 유연하게 반응 */
+    max-height: 95vh;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Feed 컴포넌트가 모달 내용 영역을 꽉 채우도록 */
+.modal-content>.feed {
+    margin: 0;
+    max-width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+    /* 부모의 max-height를 따르도록 */
+}
+
+.modal-close-button {
+    position: absolute;
+    top: -40px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+    z-index: 2001;
+    padding: 10px;
+}
+
+/* ====================================
+   반응형 디자인
+   ==================================== */
 @media (max-width: 768px) {
-  .profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+    .container {
+        margin-left: 0;
+        padding: 15px;
+    }
 
-  .profile-image {
-    margin-right: 0;
-    margin-bottom: 20px;
-  }
+    .profile-container {
+        margin-left: 0;
+    }
 
-  .profile-stats {
-    gap: 15px;
-  }
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 80px;
+    }
+
+    .profile-image-box {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .profile-stats {
+        gap: 15px;
+        font-size: 14px;
+    }
+
+    .gallery {
+        gap: 3px;
+    }
 }

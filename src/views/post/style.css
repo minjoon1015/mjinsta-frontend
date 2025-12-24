@@ -1,0 +1,707 @@
+/* ----------------------------------------------------------- */
+/* 1. 기본 레이아웃 및 컨테이너 스타일 */
+/* ----------------------------------------------------------- */
+
+.post-container {
+    margin-left: 500px;
+    margin-top: 50px;
+    min-height: 700px;
+    width: 40%;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header-post {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+}
+
+.header-title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.header-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.header-share {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s;
+}
+
+.header-share.enabled {
+    color: #3b82f6;
+    cursor: pointer;
+}
+
+.header-share.enabled:hover {
+    color: #2563eb;
+}
+
+.header-share.disabled {
+    color: #bfdbfe;
+    cursor: default;
+}
+
+.content-area {
+    display: flex;
+    padding: 16px;
+    gap: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    align-items: flex-start;
+}
+
+/* ------------------- 다중 이미지 관련 스타일 ------------------- */
+.photo-preview-list {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto; 
+    overflow-y: hidden; 
+    max-height: 95px; 
+    padding-bottom: 5px;
+    max-width: 100%;
+    flex-shrink: 0;
+}
+
+.photo-preview {
+    width: 80px;
+    height: 80px;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.photo-preview.image-item {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.photo-preview.add-photo-button {
+    cursor: pointer;
+    border: 1px dashed #d1d5db;
+}
+
+.remove-image-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+}
+
+.remove-image-button svg {
+    stroke-width: 3;
+}
+/* ----------------------------------------------------------- */
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder {
+    text-align: center;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.placeholder p {
+    margin-top: 4px;
+}
+
+/* ----------------------------------------------------------- */
+/* ⭐️ 캡션 입력 UI 수정: 오버레이 기법을 위한 CSS ⭐️ */
+/* ----------------------------------------------------------- */
+
+/* 캡션 입력 영역의 기본 구조를 변경합니다. */
+.caption-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px; /* 입력 필드 높이와 동일하게 설정 */
+    flex-grow: 1; /* content-area에서 남은 공간을 차지하도록 설정 */
+}
+
+/* 기존 caption-input 스타일 수정 (투명하게) */
+.caption-input {
+    width: 100%;
+    height: 80px;
+    padding: 8px;
+    resize: none;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    color: transparent; /* 입력된 글자를 투명하게 숨김 */
+    background-color: transparent; /* 배경 투명 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2; /* 오버레이 위에 올라오도록 z-index 설정 */
+    caret-color: #111827; /* 커서 색상은 유지 */
+    
+    /* ⭐️ 커서 일치를 위한 핵심 수정 ⭐️ */
+    line-height: 1.5; /* 줄 간격 명시 (오버레이와 일치) */
+    font-family: inherit; /* 폰트 일치 */
+}
+
+.caption-input::placeholder {
+    color: #9ca3af;
+}
+
+/* 1. 하이라이트된 텍스트를 표시하는 오버레이 스타일 */
+.highlight-overlay {
+    width: 100%;
+    height: 80px;
+    padding: 8px;
+    font-size: 14px;
+    color: #111827; 
+    overflow-y: auto; 
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; 
+    pointer-events: none; 
+
+    /* ⭐️ 커서 일치를 위한 핵심 수정 ⭐️ */
+    line-height: 1.5; /* 줄 간격 명시 (인풋과 일치) */
+    font-family: inherit; /* 폰트 일치 */
+}
+
+/* 2. 해시태그 강조 스타일 */
+.hashtag-highlight {
+    color: #3b82f6; /* 강조 색상 (파란색) */
+    font-weight: 500; /* 약간의 강조 */
+}
+
+/* ----------------------------------------------------------- */
+
+
+.options {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.option-item:hover {
+    background-color: #f9fafb;
+}
+
+.location-text.active {
+    color: #3b82f6;
+}
+
+.rotate-icon {
+    transform: rotate(180deg);
+}
+
+
+/* ----------------------------------------------------------- */
+/* 2. 모달 공통 스타일 */
+/* ----------------------------------------------------------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px; 
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column; 
+    max-height: 90vh; 
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0; 
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.modal-close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4b5563;
+}
+
+.modal-body {
+    padding: 16px;
+    overflow-y: hidden;
+    flex-grow: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+.map-body {
+    width: 100%;
+}
+
+.search-input-container {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.modal-search-input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.location-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.location-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.location-item:hover {
+    background-color: #f9fafb;
+}
+
+.location-item:last-child {
+    border-bottom: none;
+}
+
+.no-location {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.selected-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0; 
+}
+
+.no-selection {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.map-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px; 
+    border: 1px solid #ccc;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+    gap: 10px;
+    flex-shrink: 0; 
+}
+
+.button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-button {
+    background-color: #3b82f6;
+    color: #fff;
+    border: none;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: #2563eb;
+}
+
+.primary-button:disabled {
+    background-color: #bfdbfe;
+    cursor: default;
+}
+
+.secondary-button {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.secondary-button:hover {
+    background-color: #e5e7eb;
+}
+
+/* ------------------- 미디어 쿼리 ------------------- */
+@media (max-width: 600px) {
+    .post-container {
+        margin-left: 0;
+        margin-top: 0;
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+    }
+    
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}
+
+
+/* ----------------------------------------------------------- */
+/* 3. 사람 태그 모달 (TagPeopleModal) 스타일 */
+/* ----------------------------------------------------------- */
+
+.modal-content.tag-modal {
+    max-width: 700px;
+    max-height: 95vh; /* 검색창, 헤더, 푸터를 위한 공간 */
+}
+
+/* 3.1. 고정된 상단 검색 영역 */
+
+.tag-search-fixed-area {
+    position: relative;
+    padding: 16px 16px 0 16px; 
+    z-index: 60;
+    flex-shrink: 0;
+}
+
+.tag-search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.tag-main-search-input {
+    width: 100%;
+    padding: 10px 40px 10px 40px; 
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background-color: #f7f7f7; /* 검색 영역 배경색 */
+}
+
+.tag-main-search-input:focus {
+    border-color: #3b82f6;
+    background-color: #fff;
+}
+
+.tag-search-fixed-area .search-icon {
+    position: absolute;
+    left: 10px;
+    color: #9ca3af;
+    pointer-events: none; /* 아이콘 클릭 방지 */
+    z-index: 65;
+}
+
+.tag-cancel-button {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 65;
+}
+
+/* 3.2. 고정된 검색 결과 목록 */
+
+.tag-search-results-fixed {
+    position: absolute;
+    top: 100%; 
+    left: 16px;
+    right: 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 55; /* 이미지 영역 위에 표시 */
+}
+
+.tag-search-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.tag-search-item:hover {
+    background-color: #f9f9f9;
+}
+
+.tag-search-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.tag-search-info .username {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.tag-search-info .name {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.tag-search-item.no-results {
+    justify-content: center;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* 3.3. 모달 본체 및 이미지 영역 */
+
+.tag-body {
+    padding: 0 16px 16px 16px; /* 상단 검색 영역에 이미 padding이 있으므로 상단 패딩 제거 */
+    overflow-y: hidden;
+    flex-grow: 1;
+}
+
+.tag-photo-area {
+    position: relative;
+    width: 100%;
+    /* 이미지 영역이 남은 공간을 최대한 채우도록 flex 속성 조정 */
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: crosshair; /* 태그 추가를 위한 커서 */
+    min-height: 300px; /* 최소 높이 지정 */
+}
+
+.tag-photo-area.no-image {
+    cursor: default;
+    background-color: #f0f0f0;
+    color: #888;
+}
+
+.tag-image-preview {
+    /* 이미지 자체가 태그 영역의 크기를 결정하지 않고, 부모 컨테이너에 맞춰집니다. */
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; 
+}
+
+
+/* 3.4. 이미지 탐색 버튼 */
+
+.nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.nav-left {
+    left: 10px;
+}
+
+.nav-right {
+    right: 10px;
+}
+
+.nav-button:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.nav-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+/* 3.5. 태그 마커 및 최종 라벨 */
+
+/* 최종 태그 라벨 (사용자 이름 표시) */
+.final-tag-label {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    
+    /* X 버튼을 위한 공간 확보 */
+    padding: 4px 20px 4px 8px; 
+    
+    border-radius: 12px;
+    font-size: 12px;
+    transform: translate(-50%, -100%);
+    white-space: nowrap;
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.final-tag-label:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.tag-remove-x {
+    position: absolute;
+    right: 2px; /* 오른쪽 끝에 배치 */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+
+/* 태그 선택 대기 중인 위치 표시 (active-tag-dot) */
+.final-tag-label.active-tag-dot {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: transparent; /* 배경색 투명 */
+    border: 2px solid white; /* 흰색 테두리 */
+    box-shadow: 0 0 0 2px #3b82f6; /* 파란색 외곽선 */
+    cursor: crosshair;
+    transform: translate(-50%, -50%); /* 중심 기준으로 위치 조정 */
+    transition: all 0.1s;
+}
+.final-tag-label.active-tag-dot:hover {
+    box-shadow: 0 0 0 3px #3b82f6;
+}
+
+/* 3.6. 모달 완료 버튼 */
+
+.modal-done-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 0 0 12px 12px; /* 모달 하단 둥글게 */
+    flex-shrink: 0;
+}
+
+.modal-done-button:hover:not(:disabled) {
+    background-color: #2563eb;
+}
+
+.modal-done-button:disabled {
+    background-color: #bfdbfe;
+    cursor: not-allowed;
+}

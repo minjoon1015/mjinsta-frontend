@@ -1,0 +1,54 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* 🚨 수정: 's' 단위 제거하여 배경색/투명도 정상화 */
+    background-color: rgba(0, 0, 0, 0.5); 
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    
+    /* 🚨 수정: height를 뷰포트 전체(100vh)로 변경하여 화면을 완전히 덮도록 함 */
+    height: 100vh; 
+    /* 🚨 수정: 불필요한 margin-top 제거 */
+}
+
+/* 기존 모달 레이아웃 유지 */
+.post-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    max-height: 120vh;
+    overflow: auto;
+}
+
+/* Feed 컴포넌트 스타일 유지 */
+.modal-content > .feed { 
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* X 버튼: 모달 스크롤 영향받지 않도록 overlay 기준으로 고정 */
+.modal-close-button {
+    position: fixed; /* ← 가장 중요 */
+    top: 20px; /* 화면 상단 */
+    right: 3px; /* 화면 오른쪽 */
+    background: rgba(0, 0, 0, 1);
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: white;
+    z-index: 3000;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

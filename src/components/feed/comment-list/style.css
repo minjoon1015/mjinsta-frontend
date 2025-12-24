@@ -1,0 +1,156 @@
+.insta-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; 
+    z-index: 1000;
+}
+
+.insta-modal-content {
+    background: #ffffff; 
+    border-radius: 12px 12px 0 0; 
+    width: 100%; 
+    max-width: 500px;
+    height: 80vh; 
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out; 
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.insta-modal-header {
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #dbdbdb; 
+    position: relative;
+    flex-shrink: 0;
+}
+
+.insta-modal-header h3 {
+    font-size: 16px;
+    font-weight: 600; 
+    margin: 0;
+}
+
+.insta-close-btn {
+    font-size: 24px; 
+    cursor: pointer;
+    color: #262626; 
+    position: absolute;
+    left: 15px; 
+}
+
+.insta-comment-list-body {
+    padding: 15px 15px 0 15px;
+    overflow-y: auto;
+    flex-grow: 1;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; 
+}
+
+.instagram-comment-item {
+    display: flex;
+    margin-bottom: 18px;
+    align-items: flex-start; 
+}
+
+.comment-profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    flex-shrink: 0; 
+}
+
+.comment-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap; 
+    line-height: 1.4;
+    padding-top: 2px;
+}
+
+.insta-comment-username {
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 6px; 
+    color: #262626; 
+    flex-shrink: 0; 
+}
+
+.insta-comment-text {
+    font-size: 14px;
+    color: #262626;
+    white-space: pre-wrap; 
+    word-break: break-word; 
+}
+
+.insta-no-comments-message, 
+.insta-loading-message,
+.insta-end-of-list-message {
+    text-align: center;
+    color: #8e8e8e;
+    padding: 20px;
+    font-size: 14px;
+}
+
+.insta-comment-input-area {
+    padding: 10px 15px;
+    border-top: 1px solid #dbdbdb;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.insta-comment-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #262626;
+    margin: 0 10px;
+}
+
+.insta-comment-input::placeholder {
+    color: #8e8e8e;
+}
+
+.insta-post-button {
+    background: none;
+    border: none;
+    color: #0095f6; 
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 0;
+    cursor: pointer;
+    opacity: 0.3; 
+    transition: opacity 0.2s;
+}
+
+.insta-post-button:not([disabled]) {
+    opacity: 1; 
+}
+
+@media (min-width: 451px) {
+    .insta-modal-overlay {
+        align-items: center;
+    }
+    .insta-modal-content {
+        border-radius: 12px;
+        height: 500px; 
+        animation: none; 
+    }
+}

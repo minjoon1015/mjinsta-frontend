@@ -1,4 +1,5 @@
 import React from 'react';
+import user_logo from '../../assets/user'
 
 export default function ChatRoomList({ user, chatRoomList, selectedRoom, setSelectedRoom, setOpenNewChat, setNewChatRoomState }) {
     return (

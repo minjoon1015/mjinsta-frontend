@@ -838,9 +838,6 @@
                   <i className="fa-solid fa-arrow-left"></i>
                 </button>
                 <h3>상세 정보</h3>
-                <button className="edit-btn">
-
-                </button>
               </div>
 
               <div className="room-info-section">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './style.css'
 import useUserStore from '../../stores/UserStore'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { NavigationType, useLocation, useNavigate } from 'react-router-dom'
 import NotificationPanel from '../sidebar-left-notify'
 import useSearchPanelStore from '../../stores/SearchPanelStore' // 스토어 import
 
@@ -23,6 +23,10 @@ export default function SidebarLeft() {
 
   const onClickProfilePage = () => {
     navigate("/profile");
+  }
+
+  const onClickPostPage = () => {
+    navigate("/post");
   }
 
   const onClickMainPage = () => {
@@ -53,7 +57,7 @@ export default function SidebarLeft() {
           {renderNavItem("fa-magnifying-glass", "검색", toggleSearch)}
           {renderNavItem("fa-paper-plane", "메시지", onClickMessagesPage)}
           {renderNavItem("fa-bell", "알림", () => setShowNotification(!showNotification))}
-          {renderNavItem("fa-circle-plus", "만들기")}
+          {renderNavItem("fa-circle-plus", "만들기", onClickPostPage)}
           {renderNavItem("fa-user", "프로필", onClickProfilePage)}
         </div>
       </div>

@@ -148,21 +148,22 @@ export default function Messages() {
     }
   }
 
+
   useEffect(() => {
     if (!connected || !selectedRoom) {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
-      if (readInfoSubscriptionRef.current) {
-        readInfoSubscriptionRef.current.unsubscribe();
-        readInfoSubscriptionRef.current = null;
-      }
       return;
+    }
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+    }
+    if (readInfoSubscriptionRef.current) {
+      readInfoSubscriptionRef.current.unsubscribe();
+      readInfoSubscriptionRef.current = null;
     }
 
     subscriptionRef.current = stompClient.subscribe(
-      `/topic/chat/${selectedRoom.chatroomId}`,
+      `/topic/chat.${selectedRoom.chatroomId}`,
       (msg) => {
         const data = JSON.parse(msg.body);
         stompClient.publish({
@@ -183,8 +184,9 @@ export default function Messages() {
     );
 
     getChatRoomMembersReadInfo();
-    readInfoSubscriptionRef.current = stompClient.subscribe(`/topic/members/info/${selectedRoom.chatroomId}`, (msg) => {
+    readInfoSubscriptionRef.current = stompClient.subscribe(`/topic/members.info.${selectedRoom.chatroomId}`, (msg) => {
       const data = JSON.parse(msg.body);
+      console.log(data);
       setMembersReadInfo((prev) =>
         prev.map((m) =>
           m.userId === data.userId
@@ -198,7 +200,7 @@ export default function Messages() {
 
     return () => {
       if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current.unsubscribe(); // 
         subscriptionRef.current = null;
         setMessage([]);
       }
@@ -208,6 +210,7 @@ export default function Messages() {
       }
       setMembersReadInfo([]);
     };
+
   }, [connected, selectedRoom, stompClient]);
 
   useEffect(() => {
@@ -555,6 +558,7 @@ export default function Messages() {
       });
 
       const data = await response.json();
+      console.log(data);
       if (data.code !== "SC") return;
       setMembersInfo(data.list);
       const u = data.list.find(m => m.id === user.id);
@@ -651,7 +655,7 @@ export default function Messages() {
               {message && message.map((m, index) => (
                 <div key={index} className={`message-item ${m.senderId === user.id ? 'sent' : 'received'}`}>
                   {m.type === "INVITE" && <div className="system-notification-text system-center-text">{m.message}</div>}
-                  {m.type === "LEAVE" && <div className="system-notification-text system-center-text">{m.message}</div>}                  
+                  {m.type === "LEAVE" && <div className="system-notification-text system-center-text">{m.message}</div>}
                   {m.type !== "INVITE" && m.type !== "LEAVE" && (
                     <>
                       <div className="message-header">

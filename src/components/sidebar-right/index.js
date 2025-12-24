@@ -1,10 +1,11 @@
+// SidebarRight.js
 import React, { useEffect, useState } from 'react';
 import './style.css';
-import user from '../../assets/user.png';
+import userDefaultImage from '../../assets/user.png'; 
 import useUserStore from '../../stores/UserStore';
 import { useNavigate } from 'react-router-dom';
 import useCookie from "react-use-cookie";
-import {follow} from '../../api/follow'
+import useStompClientStore from '../../stores/StompClientStore';
 
 export default function SidebarRight() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -12,6 +13,9 @@ export default function SidebarRight() {
   const [cookie, setCookies] = useCookie("token");
   const [recommendUsers, setRecommendUsers] = useState([]);
   const navigate = useNavigate();
+  
+  // STOMP 클라이언트 인스턴스 및 연결 상태 가져오기
+  const { stompClient, setConnected } = useStompClientStore(); 
 
   const getRecommendUserList = async () => {
     try {
@@ -26,7 +30,7 @@ export default function SidebarRight() {
         setRecommendUsers(data.list);
       }
     } catch (error) {
-      
+      // 오류 처리 로직
     }
   }
 
@@ -45,12 +49,12 @@ export default function SidebarRight() {
         const data = await response.json();
         setRecommendUsers(prev => prev.map((u, i) => i === index ? {...u, following:false} : u));
     } catch (error) {
-        
+      // 오류 처리 로직
     }
   }
 
   const onClickFollow = async (targetId, index) => {
-     try {
+      try {
         const response = await fetch(`${apiUrl}/api/user/follow`, {
             method:"POST",
             headers:{
@@ -66,7 +70,7 @@ export default function SidebarRight() {
           setRecommendUsers(prev => prev.map((u, i) => i === index ? {...u, following:true} : u));
         }
     } catch (error) {
-        
+      // 오류 처리 로직
     }
   }
 
@@ -75,6 +79,17 @@ export default function SidebarRight() {
   }, [])
   
   const onClickLogOut = () => {
+    if (stompClient && stompClient.active) {
+      stompClient.deactivate()
+        .then(() => {
+          console.log("STOMP connection deactivated successfully.");
+          setConnected(false);
+        })
+        .catch(error => {
+          console.error("Error during STOMP deactivation:", error);
+        });
+    }
+
     setCookies("");
     clearUser();
     navigate("/auth");
@@ -91,7 +106,7 @@ export default function SidebarRight() {
   return (
     <div className="sidebar-right-container">
       <div className="profile-section">
-        <img src={user?.profileImage} alt="user" className="avatar" />
+        <img src={user?.profileImage || userDefaultImage} alt="user" className="avatar" />
         <div className="profile-info">
           <div className="username">{user?.id}</div>
           <div className="fullname">{user?.name}</div>
@@ -115,8 +130,8 @@ export default function SidebarRight() {
               <div className="username">{user.id}</div>
               <div className="fullname">{user.name}</div>
             </div>
-            {user.following == true && <button className="unFollow-btn" onClick={()=>{onClickUnFollow(user.id, i)}}>팔로잉</button>}
-            {user.following == false && <button className="follow-btn" onClick={()=>{onClickFollow(user.id, i)}}>팔로우</button>}
+            {user.following === true && <button className="unFollow-btn" onClick={()=>{onClickUnFollow(user.id, i)}}>팔로잉</button>}
+            {user.following === false && <button className="follow-btn" onClick={()=>{onClickFollow(user.id, i)}}>팔로우</button>}
           </li>
           )
         })}

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import RoomDetails from '../room-details';
 
 export default function ChatWindow({ user, cookies, apiUrl, navigate, stompClient, connected, selectedRoom, setSelectedRoom, setChatRoomList, setOpenNewChat, setNewChatRoomState }) {
-    // 채팅방 내부에서만 필요한 상태 및 Ref
     const messageEndRef = useRef(null);
     const subscriptionRef = useRef(null);
     const readInfoSubscriptionRef = useRef(null);
@@ -131,6 +130,7 @@ export default function ChatWindow({ user, cookies, apiUrl, navigate, stompClien
         getChatRoomMembersReadInfo();
         readInfoSubscriptionRef.current = stompClient.subscribe(`/topic/members/info/${selectedRoom.chatroomId}`, (msg) => {
             const data = JSON.parse(msg.body);
+            console.log(data);
             setMembersReadInfo((prev) =>
                 prev.map((m) =>
                     m.userId === data.userId

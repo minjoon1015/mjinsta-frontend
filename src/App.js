@@ -1,4 +1,3 @@
-// App.js
 import './App.css';
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
@@ -10,8 +9,11 @@ import Auth from './views/auth';
 import Main from './views/main';
 import OauthGoogle from './views/oauth-google';
 import Profile from './views/profile';
-import Messages from './views/messages';
 import Message from './views/message';
+import Info from './views/info';
+import Recommend from './views/recommend';
+import ProfileEdit from './views/profile-edit';
+import Post from './views/post';
 
 import { getUserMe } from './api/getUserMe';
 import { getNotifyList } from './api/getNotificationList';
@@ -19,9 +21,6 @@ import { getNotifyList } from './api/getNotificationList';
 import useUserStore from './stores/UserStore';
 import useNotificationStore from './stores/NotificationStore';
 import useStompClientStore from './stores/StompClientStore';
-import Info from './views/info';
-import Recommend from './views/recommend';
-import ProfileEdit from './views/profile-edit';
 
 function App() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -29,10 +28,10 @@ function App() {
 
   const { notificationList, setNotificationList, notification, setNotification } = useNotificationStore();
   const { user, setUser, clearUser } = useUserStore();
+  const { stompClient, setStompClient, setConnected } = useStompClientStore();
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { stompClient, setStompClient, setConnected } = useStompClientStore();
 
   useEffect(() => {
     if (!cookies && !user) return;
@@ -41,7 +40,10 @@ function App() {
       webSocketFactory: () => new SockJS(`${apiUrl}/ws`),
       connectHeaders: { Authorization: `Bearer ${cookies}` },
       reconnectDelay: 5000,
+      heartbeatIncoming: 25000,
+      heartbeatOutgoing: 25000,
       onConnect: () => {
+        console.log("STOMP Connected");
         client.subscribe("/user/queue/notify", (message) => {
           const messageBody = JSON.parse(message.body);
           setNotification(messageBody);
@@ -49,11 +51,13 @@ function App() {
       },
       onStompError: (frame) => {
         console.error("STOMP Error:", frame);
-      }
+      },
     });
+
     setStompClient(client);
     setConnected(true);
     client.activate();
+
     return () => {
       if (client && client.active) {
         client.deactivate();
@@ -62,7 +66,7 @@ function App() {
   }, [cookies]);
 
   useEffect(() => {
-    if ((!cookies || cookies === "") && location.pathname !== "/oauth/google" ) {
+    if ((!cookies || cookies === "") && location.pathname !== "/oauth/google") {
       navigate("/auth");
       return;
     }
@@ -71,10 +75,12 @@ function App() {
       if (cookies.length > 0 && user == null) {
         const userData = await getUserMe(cookies);
         const notifyData = await getNotifyList(cookies);
+
         if (userData == false) {
           setCookie("");
           clearUser();
         }
+
         setNotificationList(notifyData);
         setUser(userData);
       }
@@ -84,16 +90,17 @@ function App() {
   }, [user, cookies]);
 
   return (
-    <div className='app-container'>
+    <div className="app-container">
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/oauth/google" element={<OauthGoogle />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/messages" element={<Message />} />
-        <Route path='/info/:userId' element={<Info />} />
-        <Route path='/recommend/people' element={<Recommend />} />
-        <Route path='/profile/edit' element={<ProfileEdit />} />
+        <Route path="/info/:userId" element={<Info />} />
+        <Route path="/recommend/people" element={<Recommend />} />
+        <Route path="/profile/edit" element={<ProfileEdit />} />
+        <Route path="/post" element={<Post />} />
         <Route path="*" element={<>Not Found</>} />
       </Routes>
     </div>

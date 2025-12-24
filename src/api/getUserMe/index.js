@@ -8,6 +8,7 @@ export const getUserMe = async (token) => {
       },
     });
     const data = await response.json();
+    console.log(data);
     if (data.code !== "SC") {
       return false;
     }

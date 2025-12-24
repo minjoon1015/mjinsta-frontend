@@ -1,0 +1,14 @@
+.feed-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px; /* 피드 간 간격 */
+    width: 100%;
+}
+
+.feed-status-message {
+    padding: 20px;
+    color: #8e8e8e;
+    font-size: 14px;
+    text-align: center;
+}   

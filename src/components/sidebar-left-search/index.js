@@ -4,6 +4,7 @@ import useCookie from 'react-use-cookie';
 import close from '../../assets/close.png';
 import { useNavigate } from 'react-router-dom'
 import useUserStore from '../../stores/UserStore';
+import user_logo from '../../assets/user.png'
 
 export default function SearchPanel() {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ export default function SearchPanel() {
         {results.map((r) => (
           <div className="result-item" key={r.id} onClick={() => {onClickGoToUserInfoPage(r.id)}}>
             <img
-              src={r.profileImage} 
+              src={r.profileImage || user_logo} 
               alt={r.name} 
               className="result-profile-img"
             />
