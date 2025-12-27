@@ -32,4 +32,4 @@ src/
  index.js
  index.css
  index.js
- .env # 
+ .env # 배포 환경에서는 환경 변수로 설정하여 처리

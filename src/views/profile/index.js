@@ -108,6 +108,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('file', file);
 
+      console.log("쿠키입니다 :" + cookies);
       const response = await fetch(`${apiUrl}/api/file/upload/profile`, {
         method: 'POST',
         headers: {
