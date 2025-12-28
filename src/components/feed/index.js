@@ -43,14 +43,15 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
         return {
             postId: data.postId,
-            // 백엔드 SimpleUserDto (data.user.id, data.user.profileImage) 대응
-            username: data.user?.id || data.userId || "알 수 없는 사용자",
+            // SimpleUserDto 구조 반영: data.user.id, data.user.profileImage
+            username: data.user?.id || "알 수 없는 사용자",
             profileImage: data.user?.profileImage || "/default-profile.png", 
             location: data.location,
             likes: data.favoriteCount || 0,
             caption: data.comment,
             commentsCount: data.commentCount || 0,
-            timestamp: data.createAt || data.createdAt,
+            // PostDto의 필드명 createdAt 반영
+            timestamp: data.createdAt, 
             images: transformedImages,
             isLiked: data.isLiked ?? false
         };
@@ -136,13 +137,12 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
     const onClickCommentListBtn = () => setIsCommentModalOpen(true);
 
     useEffect(() => {
-        // 이미 데이터가 충분히 있는 경우(FeedList 등에서 전달됨) API 호출 스킵
+        // 이미 데이터가 충분히 있는 경우 API 호출 스킵
         if (initialPostData && postData.postId) {
             setLoading(false);
             return;
         }
 
-        // postId만 있는 경우(상세 페이지 등) API 호출
         const getPostDetailsInfo = async () => {
             if (!postId) return;
             setLoading(true);
@@ -169,12 +169,13 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return "";
-        return timestamp.split('T')[0];
+        // ISO 포맷 (2025-12-28T...)에서 날짜만 추출
+        return timestamp.includes('T') ? timestamp.split('T')[0] : timestamp;
     };
 
     if (loading) return (
-        <div className="feed-loading-container" style={{ padding: '20px', textAlign: 'center' }}>
-            <i className="fas fa-spinner fa-spin"></i> 로딩 중...
+        <div className="feed-loading-container" style={{ padding: '40px', textAlign: 'center' }}>
+            <i className="fas fa-spinner fa-spin"></i>
         </div>
     );
     
@@ -184,12 +185,14 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
         <div className="feed">
             <header className="feed-header">
                 <div className="user-info-container">
-                    {/* 작성자의 프로필 이미지 사용 */}
+                    {/* SimpleUserDto의 profileImage 필드 사용 */}
                     <img 
                         src={postData.profileImage} 
                         alt="프로필" 
                         className="avatar" 
                         onError={(e) => { e.target.src = "/default-profile.png"; }}
+                        onClick={() => navigate(`/info/${postData.username}`)}
+                        style={{ cursor: 'pointer' }}
                     />
                     <div className="header-text">
                         <span className="username" onClick={() => navigate(`/info/${postData.username}`)}>
@@ -198,7 +201,9 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
                         <span className="location">{postData.location || ""}</span>
                     </div>
                 </div>
-                <i className="fas fa-ellipsis-h more-btn"></i>
+                <div className="header-actions">
+                    <i className="fas fa-ellipsis-h more-btn"></i>
+                </div>
             </header>
 
             <div className="feed-image-carousel">
@@ -261,12 +266,12 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
             <div className="feed-caption">
                 {postData.caption && (
-                    <p>
+                    <div className="caption-content">
                         <span className="username" onClick={() => navigate(`/info/${postData.username}`)}>
                             {postData.username}
                         </span>{" "}
-                        {postData.caption}
-                    </p>
+                        <span className="text">{postData.caption}</span>
+                    </div>
                 )}
             </div>
 
