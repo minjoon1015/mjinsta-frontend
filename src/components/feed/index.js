@@ -14,12 +14,13 @@ const EMPTY_POST_DATA = {
     postId: null,
     username: "",
     profileImage: "",
-    comment: "",
+    caption: "",
     location: "",
     likes: 0,
     commentsCount: 0,
     images: [],
-    isLiked: false
+    isLiked: false,
+    timestamp: ""
 };
 
 export default function Feed({ postId, initialPostData, onUpdatePost }) {
@@ -27,7 +28,7 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
     const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
 
-    // 데이터 변환 함수: 서버의 DTO 구조를 프론트엔드 UI 구조로 매핑
+    // 서버 데이터를 프론트엔드 UI 구조로 변환하는 함수
     const transformPostData = (data) => {
         if (!data) return EMPTY_POST_DATA;
         
@@ -42,20 +43,20 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
         return {
             postId: data.postId,
-            // 백엔드 SimpleUserDto 구조 (data.user.id, data.user.profileImage) 대응
-            username: data.user?.id || "알 수 없는 사용자",
+            // 백엔드 SimpleUserDto (data.user.id, data.user.profileImage) 대응
+            username: data.user?.id || data.userId || "알 수 없는 사용자",
             profileImage: data.user?.profileImage || "/default-profile.png", 
             location: data.location,
             likes: data.favoriteCount || 0,
             caption: data.comment,
             commentsCount: data.commentCount || 0,
-            timestamp: data.createAt, // 백엔드 필드명(createAt) 확인
+            timestamp: data.createAt || data.createdAt,
             images: transformedImages,
             isLiked: data.isLiked ?? false
         };
     };
 
-    // 초기 데이터가 있으면 변환해서 넣고, 없으면 비움
+    // 초기 데이터 존재 여부에 따라 상태 설정
     const [postData, setPostData] = useState(
         initialPostData ? transformPostData(initialPostData) : EMPTY_POST_DATA
     );
@@ -103,7 +104,7 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
     const onClickLikeBtn = async () => {
         try {
-            const response = await fetch(`${apiUrl}/api/post/like?postId=${postId}`, {
+            const response = await fetch(`${apiUrl}/api/post/like?postId=${postData.postId}`, {
                 method: "POST",
                 headers: { Authorization: `Bearer ${cookies}` }
             });
@@ -135,13 +136,15 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
     const onClickCommentListBtn = () => setIsCommentModalOpen(true);
 
     useEffect(() => {
-        // 이미 데이터가 있으면(FeedList에서 넘겨줌) 다시 호출하지 않음
-        if (initialPostData) {
+        // 이미 데이터가 충분히 있는 경우(FeedList 등에서 전달됨) API 호출 스킵
+        if (initialPostData && postData.postId) {
             setLoading(false);
             return;
         }
 
+        // postId만 있는 경우(상세 페이지 등) API 호출
         const getPostDetailsInfo = async () => {
+            if (!postId) return;
             setLoading(true);
             try {
                 const url = `${apiUrl}/api/post/get/details_info?postId=${postId}`;
@@ -155,33 +158,44 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
                     setPostData(transformPostData(responseData.post));
                 }
             } catch (error) {
-                console.error("API 호출 오류:", error);
+                console.error("상세 정보 조회 오류:", error);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         getPostDetailsInfo();
-    }, [postId, apiUrl, cookies, initialPostData]);
+    }, [postId, initialPostData, apiUrl, cookies]);
 
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return "";
         return timestamp.split('T')[0];
     };
 
-    if (loading) return <div className="feed-loading">로딩 중...</div>;
+    if (loading) return (
+        <div className="feed-loading-container" style={{ padding: '20px', textAlign: 'center' }}>
+            <i className="fas fa-spinner fa-spin"></i> 로딩 중...
+        </div>
+    );
+    
     if (!postData.postId) return null;
 
     return (
         <div className="feed">
             <header className="feed-header">
                 <div className="user-info-container">
-                    {/* 수정됨: postData에서 추출한 작성자의 프로필 이미지를 사용 */}
-                    <img src={postData.profileImage} alt="프로필 사진" className="avatar" />
+                    {/* 작성자의 프로필 이미지 사용 */}
+                    <img 
+                        src={postData.profileImage} 
+                        alt="프로필" 
+                        className="avatar" 
+                        onError={(e) => { e.target.src = "/default-profile.png"; }}
+                    />
                     <div className="header-text">
                         <span className="username" onClick={() => navigate(`/info/${postData.username}`)}>
                             {postData.username}
                         </span>
-                        <span className="location">{postData.location || "위치 정보 없음"}</span>
+                        <span className="location">{postData.location || ""}</span>
                     </div>
                 </div>
                 <i className="fas fa-ellipsis-h more-btn"></i>
@@ -221,7 +235,7 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
                     ))}
                 </Swiper>
 
-                {postData.images[currentImageIndex]?.tags.length > 0 && (
+                {postData.images[currentImageIndex]?.tags?.length > 0 && (
                     <i
                         className={`fas fa-user-tag tag-icon ${showTags ? 'active' : ''}`}
                         onClick={() => setShowTags(!showTags)}
@@ -247,7 +261,12 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
             <div className="feed-caption">
                 {postData.caption && (
-                    <><span className="username">{postData.username}</span> {postData.caption}</>
+                    <p>
+                        <span className="username" onClick={() => navigate(`/info/${postData.username}`)}>
+                            {postData.username}
+                        </span>{" "}
+                        {postData.caption}
+                    </p>
                 )}
             </div>
 
