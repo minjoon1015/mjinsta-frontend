@@ -42,13 +42,13 @@ export default function FeedList({ profileImage }) {
             });
 
             const data = await response.json();
-            console.log(data);
 
             if (data.code === "SC") {
                 const newFeeds = data.feed || [];
                 
                 if (newFeeds.length === 0) {
                     setHasMore(false);
+
                 } else {
                     // 기존 포스트에 새로 가져온 포스트 추가
                     setPosts(prev => [...prev, ...newFeeds]);
@@ -75,7 +75,6 @@ export default function FeedList({ profileImage }) {
                 setHasMore(false);
             }
         } catch (error) {
-            console.error("Feed API Error:", error);
             setHasMore(false);
         } finally {
             setLoading(false);
@@ -107,8 +106,8 @@ export default function FeedList({ profileImage }) {
 
     const handleUpdatePost = (updatedData) => {
         setPosts(prev => prev.map(post => 
-            post.postId === updatedData.postId ? { ...post, ...updatedData } : post
-        ));
+            post.postId=== updatedData.postId ? { ...post, ...updatedData } : post
+        )); 
     };
 
     return (
@@ -130,12 +129,6 @@ export default function FeedList({ profileImage }) {
             {loading && (
                 <div className="feed-status-message">
                     <i className="fas fa-spinner fa-spin"></i> 피드를 불러오는 중...
-                </div>
-            )}
-
-            {!hasMore && posts.length > 0 && (
-                <div className="feed-status-message end">
-                    모든 게시물을 확인했습니다.
                 </div>
             )}
         </div>

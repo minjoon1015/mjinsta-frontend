@@ -12,25 +12,57 @@ import CommentList from "./comment-list";
 
 const EMPTY_POST_DATA = {
     postId: null,
-    userId: "",
+    username: "",
+    profileImage: "",
     comment: "",
     location: "",
-    favoriteCount: 0,
-    commentCount: 0,
+    likes: 0,
+    commentsCount: 0,
     images: [],
+    isLiked: false
 };
 
-export default function Feed({ postId, initialPostData, onUpdatePost, profileImage }) {
+export default function Feed({ postId, initialPostData, onUpdatePost }) {
     const [cookies] = useCookie('token');
     const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
 
-    const [postData, setPostData] = useState(initialPostData || EMPTY_POST_DATA);
-    const [loading, setLoading] = useState(true);
+    // 데이터 변환 함수: 서버의 DTO 구조를 프론트엔드 UI 구조로 매핑
+    const transformPostData = (data) => {
+        if (!data) return EMPTY_POST_DATA;
+        
+        const transformedImages = data.imageTags ? data.imageTags.map(item => ({
+            src: item.url,
+            tags: item.tags ? item.tags.map(tag => ({
+                username: tag.userId,
+                x: tag.x,
+                y: tag.y,
+            })) : []
+        })) : [];
+
+        return {
+            postId: data.postId,
+            // 백엔드 SimpleUserDto 구조 (data.user.id, data.user.profileImage) 대응
+            username: data.user?.id || "알 수 없는 사용자",
+            profileImage: data.user?.profileImage || "/default-profile.png", 
+            location: data.location,
+            likes: data.favoriteCount || 0,
+            caption: data.comment,
+            commentsCount: data.commentCount || 0,
+            timestamp: data.createAt, // 백엔드 필드명(createAt) 확인
+            images: transformedImages,
+            isLiked: data.isLiked ?? false
+        };
+    };
+
+    // 초기 데이터가 있으면 변환해서 넣고, 없으면 비움
+    const [postData, setPostData] = useState(
+        initialPostData ? transformPostData(initialPostData) : EMPTY_POST_DATA
+    );
+    const [loading, setLoading] = useState(!initialPostData);
     const [showTags, setShowTags] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
-
     const [postComment, setPostComment] = useState("");
 
     const handleCommentSuccess = () => {
@@ -40,9 +72,7 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
         }));
     };
 
-    const onChangePostComment = (e) => {
-        setPostComment(e.target.value);
-    }
+    const onChangePostComment = (e) => setPostComment(e.target.value);
 
     const onClickCommentBtn = async () => {
         if (postComment.length === 0) return;
@@ -55,40 +85,33 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
                 },
                 body: JSON.stringify({
                     postId: postData.postId,
-                    comment:postComment
+                    comment: postComment
                 })
-            })
+            });
             const data = await response.json();
             if (data.code !== "SC") return;
             setPostComment("");
             handleCommentSuccess();
-
         } catch (error) {
-            
+            console.error("댓글 작성 에러:", error);
         }
-    }
+    };
 
     const onKeyDownCommentInput = (e) => { 
-        if (e.key === 'Enter') {
-            onClickCommentBtn();
-        }
-    }
+        if (e.key === 'Enter') onClickCommentBtn();
+    };
 
     const onClickLikeBtn = async () => {
         try {
             const response = await fetch(`${apiUrl}/api/post/like?postId=${postId}`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${cookies}`
-                }
+                headers: { Authorization: `Bearer ${cookies}` }
             });
-
             const data = await response.json();
             if (data.code !== "SC") return;
 
             setPostData(prev => {
                 const isCurrentlyLiked = prev.isLiked;
-
                 const updated = {
                     ...prev,
                     isLiked: !isCurrentlyLiked,
@@ -102,45 +125,18 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
                         favoriteCount: updated.likes
                     });
                 }
-
                 return updated;
             });
-
         } catch (error) {
             console.error("좋아요 처리 중 오류:", error);
         }
     };
     
-    const onClickCommentListBtn = () => {
-        setIsCommentModalOpen(true);
-    };
-
-    const transformPostData = (data) => {
-        const transformedImages = data.imageTags.map(item => ({
-            src: item.url,
-            tags: item.tags.map(tag => ({
-                username: tag.userId,
-                x: tag.x,
-                y: tag.y,
-            }))
-        }));
-
-        return {
-            id: `post${data.postId}`,
-            username: data.userId,
-            location: data.location,
-            likes: data.favoriteCount,
-            caption: data.comment,
-            commentsCount: data.commentCount,
-            timestamp: data.createdAt,
-            images: transformedImages,
-            postId: data.postId,
-            isLiked: data.isLiked ?? false
-        };
-    };
+    const onClickCommentListBtn = () => setIsCommentModalOpen(true);
 
     useEffect(() => {
-        if (!postId) {
+        // 이미 데이터가 있으면(FeedList에서 넘겨줌) 다시 호출하지 않음
+        if (initialPostData) {
             setLoading(false);
             return;
         }
@@ -153,14 +149,10 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
                     method: "GET",
                     headers: { Authorization: `Bearer ${cookies}` }
                 });
-
                 const responseData = await response.json();
 
                 if (responseData.code === "SC" && responseData.post) {
-                    const transformed = transformPostData(responseData.post);
-                    setPostData(transformed);
-                } else {
-                    console.error("게시물 상세 정보 로드 실패:", responseData);
+                    setPostData(transformPostData(responseData.post));
                 }
             } catch (error) {
                 console.error("API 호출 오류:", error);
@@ -169,30 +161,26 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
         };
 
         getPostDetailsInfo();
-    }, [postId, apiUrl, cookies]);
+    }, [postId, apiUrl, cookies, initialPostData]);
 
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return "";
         return timestamp.split('T')[0];
     };
 
-    const onClickUserTag = (userId) => {
-        navigate(`/info/${userId}`);
-    };
-
-    if (loading) return null;
-
-    if (!postData || !postData.postId) {
-        return <div className="feed-error">게시물 정보를 찾을 수 없습니다.</div>;
-    }
+    if (loading) return <div className="feed-loading">로딩 중...</div>;
+    if (!postData.postId) return null;
 
     return (
         <div className="feed">
             <header className="feed-header">
                 <div className="user-info-container">
-                    <img src={profileImage} alt="프로필 사진" className="avatar" />
+                    {/* 수정됨: postData에서 추출한 작성자의 프로필 이미지를 사용 */}
+                    <img src={postData.profileImage} alt="프로필 사진" className="avatar" />
                     <div className="header-text">
-                        <span className="username">{postData.username}</span>
+                        <span className="username" onClick={() => navigate(`/info/${postData.username}`)}>
+                            {postData.username}
+                        </span>
                         <span className="location">{postData.location || "위치 정보 없음"}</span>
                     </div>
                 </div>
@@ -214,18 +202,14 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
                         <SwiperSlide key={imgIndex}>
                             <div className="image-wrapper">
                                 <img src={image.src} alt={`게시물 이미지 ${imgIndex + 1}`} />
-
                                 {showTags && (
                                     <div className="image-tags-overlay">
                                         {image.tags.map((tag, tagIndex) => (
                                             <div
-                                                onClick={() => onClickUserTag(tag.username)}
+                                                onClick={() => navigate(`/info/${tag.username}`)}
                                                 key={`${tag.username}-${tagIndex}`}
                                                 className="tag-bubble"
-                                                style={{
-                                                    left: `${tag.x}%`,
-                                                    top: `${tag.y}%`
-                                                }}
+                                                style={{ left: `${tag.x}%`, top: `${tag.y}%` }}
                                             >
                                                 @{tag.username}
                                             </div>
@@ -262,17 +246,28 @@ export default function Feed({ postId, initialPostData, onUpdatePost, profileIma
             </div>
 
             <div className="feed-caption">
-                {(postData.caption != null && postData.caption !== "") &&
-                    <><span className="username">{postData.username}</span> {postData.caption}</>}
+                {postData.caption && (
+                    <><span className="username">{postData.username}</span> {postData.caption}</>
+                )}
             </div>
 
             <div className="feed-comments">
-                <span className="view-comments" onClick={onClickCommentListBtn}>댓글 {postData.commentsCount}개 모두 보기</span>
+                <span className="view-comments" onClick={onClickCommentListBtn}>
+                    댓글 {postData.commentsCount}개 모두 보기
+                </span>
             </div>
 
             <div className="feed-add-comment">
-                <input type="text" placeholder="댓글 달기..." value={postComment} onChange={onChangePostComment} onKeyDown={onKeyDownCommentInput} />
-                <button className="post-comment-btn" disabled={postComment.length === 0} onClick={onClickCommentBtn}>게시</button>
+                <input 
+                    type="text" 
+                    placeholder="댓글 달기..." 
+                    value={postComment} 
+                    onChange={onChangePostComment} 
+                    onKeyDown={onKeyDownCommentInput} 
+                />
+                <button className="post-comment-btn" disabled={postComment.length === 0} onClick={onClickCommentBtn}>
+                    게시
+                </button>
             </div>
 
             <div className="feed-timestamp">{formatTimestamp(postData.timestamp)}</div>
