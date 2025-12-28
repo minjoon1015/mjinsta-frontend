@@ -43,7 +43,6 @@ function App() {
       heartbeatIncoming: 25000,
       heartbeatOutgoing: 25000,
       onConnect: () => {
-        console.log("STOMP Connected");
         client.subscribe("/user/queue/notify", (message) => {
           const messageBody = JSON.parse(message.body);
           setNotification(messageBody);
