@@ -43,7 +43,6 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
 
         return {
             postId: data.postId,
-            // SimpleUserDto 구조 반영: data.user.id, data.user.profileImage
             username: data.user?.id || "알 수 없는 사용자",
             profileImage: data.user?.profileImage || "/default-profile.png", 
             location: data.location,
