@@ -14,9 +14,6 @@ import PostGridItem from '../../components/post-grid-item';
 import Feed from '../../components/feed';
 import PostModalOverlay from '../../components/post-modal';
 
-// =================================================================
-// ⭐️ [추가된 기능] 조회 기록 API 호출 함수
-// =================================================================
 /**
  * 게시글 조회 시간을 백엔드로 전송합니다.
  * @param {string} apiUrl - API 기본 URL

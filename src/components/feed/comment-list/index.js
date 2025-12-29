@@ -1,27 +1,17 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./style.css";
+import user_logo from "../../../assets/user.png";
 
 const getCommentDto = (data) => ({
     id: data.id,
     userId: data.userId,
-    name: data.name,
+    name: data.user?.name || data.name, // 백엔드 DTO 구조에 맞춰 조정
     comment: data.content,
-    profileImage: data.profileImage
+    profileImage: data.user?.profileImage || data.profileImage
 });
 
 const ProfilePlaceholder = ({ size = 32 }) => (
-    <div
-        style={{
-            width: size,
-            height: size,
-            borderRadius: "50%",
-            backgroundColor: "#dbdbdb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0
-        }}
-    >
+    <div style={{ width: size, height: size, borderRadius: "50%", backgroundColor: "#dbdbdb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         <i className="fas fa-user" style={{ color: "#fff", fontSize: size * 0.5 }}></i>
     </div>
 );
@@ -32,173 +22,116 @@ export default function CommentList({ postId, onClose, apiUrl, cookies, onCommen
     const [lastCommentId, setLastCommentId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    
     const [newComment, setNewComment] = useState(""); 
     
     const listBodyRef = useRef(null);
     const observer = useRef(null);
-
     const allComments = [...topComments, ...paginationComments];
-    
-    const onChangeNewComment = (e) => {
-        setNewComment(e.target.value);
-    }
-    
-    const onClickNewCommentBtn = async () => {
-        if (newComment.length === 0 || !postId) return;
-        
-        const commentContent = newComment;
-        setNewComment(""); 
-        
-        try {
-            const response = await fetch(`${apiUrl}/api/post/comment`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${cookies}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    postId: postId,
-                    comment: commentContent
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (data.code === "SC" && data.comment) {
-                const newCommentDto = getCommentDto(data.comment); 
-                
-                setTopComments(prev => [newCommentDto, ...prev]);
-
-                if (onCommentSuccess) {
-                    onCommentSuccess();
-                }
-
-            } else {
-                console.error("댓글 작성 실패:", data);
-            }
-        } catch (error) {
-            console.error("댓글 작성 API 오류:", error);
-        }
-    }
-    
-    const onKeyDownNewCommentInput = (e) => { 
-        if (e.key === 'Enter') {
-            onClickNewCommentBtn();
-        }
-    }
 
     const fetchTopComments = async () => {
-        const topUrl = `${apiUrl}/api/post/comment/top-list?postId=${postId}`;
         try {
-            const response = await fetch(topUrl, {
+            const response = await fetch(`${apiUrl}/api/post/comment/top-list?postId=${postId}`, {
                 method: "GET",
                 headers: { Authorization: `Bearer ${cookies}` }
             });
-            const responseData = await response.json();
-
-            if (responseData.code === "SC") {
-                const fetchedTop = (responseData.list || []).map(getCommentDto);
-                setTopComments(fetchedTop);
+            const data = await response.json();
+            if (data.code === "SC") {
+                setTopComments((data.list || []).map(getCommentDto));
             }
         } catch (error) {
-            console.error("상단 댓글 로드 실패:", error);
+            console.error("Top comments load failed:", error);
         }
     };
 
-    const fetchPaginationComments = useCallback(
-        async (initialLoad = false) => {
-            const currentLastId = initialLoad ? null : lastCommentId;
+    const fetchPaginationComments = useCallback(async (initialLoad = false) => {
+        if (loading || (!hasMore && !initialLoad)) return;
 
-            if (!postId || loading || (!hasMore && !initialLoad)) return;
+        setLoading(true);
+        // initialLoad일 때는 null을 보내서 최신부터 가져오게 함
+        const currentLastId = initialLoad ? null : lastCommentId;
 
-            setLoading(true);
+        let url = `${apiUrl}/api/post/comment/pagination-list?postId=${postId}`;
+        if (currentLastId) url += `&commentId=${currentLastId}`;
 
-            let paginationUrl = `${apiUrl}/api/post/comment/pagination-list?postId=${postId}`;
-            if (currentLastId !== null) {
-                paginationUrl += `&commentId=${currentLastId}`;
-            }
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: { Authorization: `Bearer ${cookies}` }
+            });
+            const data = await response.json();
 
-            try {
-                const response = await fetch(paginationUrl, {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${cookies}` }
-                });
-                const responseData = await response.json();
-
-                if (responseData.code === "SC" && responseData.list) {
-                    const fetchedPage = (responseData.list || []).map(getCommentDto);
-
-                    setPaginationComments((prev) =>
-                        initialLoad ? fetchedPage : [...prev, ...fetchedPage]
-                    );
-
-                    if (fetchedPage.length > 0) {
-                        setLastCommentId(fetchedPage[fetchedPage.length - 1].id);
-                    }
-
-                    if (fetchedPage.length < 30) {
-                        setHasMore(false);
-                    }
-                } else {
+            if (data.code === "SC" && data.list) {
+                const fetched = data.list.map(getCommentDto);
+                
+                setPaginationComments(prev => initialLoad ? fetched : [...prev, ...fetched]);
+                
+                if (fetched.length > 0) {
+                    setLastCommentId(fetched[fetched.length - 1].id);
+                }
+                
+                if (fetched.length < 30) {
                     setHasMore(false);
                 }
-            } catch (error) {
-                console.error("페이징 댓글 로드 실패:", error);
+            } else {
                 setHasMore(false);
-            } finally {
-                setLoading(false);
             }
-        },
-        [postId, apiUrl, cookies, lastCommentId, loading, hasMore]
-    );
+        } catch (error) {
+            console.error("Pagination load failed:", error);
+            setHasMore(false);
+        } finally {
+            setLoading(false);
+        }
+    }, [postId, apiUrl, cookies, lastCommentId, loading, hasMore]);
 
     useEffect(() => {
         if (!postId) return;
-
         setTopComments([]);
         setPaginationComments([]);
         setLastCommentId(null);
         setHasMore(true);
-        setLoading(true);
 
-        fetchTopComments();
-        fetchPaginationComments(true);
+        const init = async () => {
+            await fetchTopComments();
+            await fetchPaginationComments(true);
+        };
+        init();
     }, [postId]);
 
+    // Intersection Observer 설정
     useEffect(() => {
         const body = listBodyRef.current;
-        if (!body) return;
+        if (!body || !hasMore || loading) return;
 
-        if (observer.current) {
-            observer.current.disconnect();
-        }
+        if (observer.current) observer.current.disconnect();
 
-        const lastElementIndex = body.children.length - 1;
-        const lastElement = body.children[lastElementIndex]; 
-        
-        if (lastElement && hasMore) {
-            observer.current = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting && !loading && hasMore) {
-                        fetchPaginationComments();
-                    }
-                },
-                {
-                    root: body,
-                    threshold: 0.1
-                }
-            );
-            observer.current.observe(lastElement);
-        }
-
-        return () => {
-            if (observer.current) {
-                observer.current.disconnect();
+        observer.current = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) {
+                fetchPaginationComments();
             }
-        };
-    }, [loading, hasMore, fetchPaginationComments, allComments.length]); 
+        }, { root: body, threshold: 0.1 });
 
+        const target = body.querySelector(".insta-end-of-list-marker") || body.lastElementChild;
+        if (target) observer.current.observe(target);
+
+        return () => observer.current?.disconnect();
+    }, [allComments.length, hasMore, loading, fetchPaginationComments]);
+
+    const onClickNewCommentBtn = async () => {
+        if (!newComment.trim()) return;
+        try {
+            const response = await fetch(`${apiUrl}/api/post/comment`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${cookies}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ postId, comment: newComment })
+            });
+            const data = await response.json();
+            if (data.code === "SC") {
+                setTopComments(prev => [getCommentDto(data.comment), ...prev]);
+                setNewComment("");
+                if (onCommentSuccess) onCommentSuccess();
+            }
+        } catch (error) { console.error(error); }
+    };
 
     return (
         <div className="insta-modal-overlay" onClick={onClose}>
@@ -209,67 +142,34 @@ export default function CommentList({ postId, onClose, apiUrl, cookies, onCommen
                 </header>
 
                 <div className="insta-comment-list-body" ref={listBodyRef}>
-                    {allComments.length === 0 && !loading && (
-                        <div className="insta-no-comments-message">아직 댓글이 없습니다.</div>
-                    )}
-
-                    {allComments.map((comment, index) => {
-                        return (
-                            <div
-                                key={`comment-${comment.id}-${index}`}
-                                className={`instagram-comment-item`}
-                            >
-                                {comment.profileImage ? (
-                                    <img
-                                        src={comment.profileImage}
-                                        alt="프로필"
-                                        className="comment-profile-img"
-                                    />
-                                ) : (
-                                    <ProfilePlaceholder size={32} />
-                                )}
-
-                                <div className="comment-content-wrapper">
-                                    <span className="insta-comment-username">
-                                        {comment.name?.trim() || comment.userId?.trim()}
-                                    </span>
-
-                                    <span className="insta-comment-text">
-                                        {comment.comment?.trim()}
-                                    </span>
-                                </div>
+                    {allComments.map((comment, index) => (
+                        <div key={`comment-${comment.id}-${index}`} className="instagram-comment-item">
+                            {comment.profileImage ? (
+                                <img src={comment.profileImage} alt="프로필" className="comment-profile-img" />
+                            ) : (
+                                <ProfilePlaceholder size={32} />
+                            )}
+                            <div className="comment-content-wrapper">
+                                <span className="insta-comment-username">{comment.name || comment.userId}</span>
+                                <span className="insta-comment-text">{comment.comment}</span>
                             </div>
-                        );
-                    })}
-
-                    {loading && (
-                        <div className="insta-loading-message">댓글 불러오는 중...</div>
-                    )}
-
-                    {!hasMore && allComments.length > 0 && !loading && (
-                        <div className="insta-end-of-list-message">
-                            --- 모든 댓글을 불러왔습니다 ---
                         </div>
-                    )}
+                    ))}
+                    {/* 관찰 대상 마커 */}
+                    <div className="insta-end-of-list-marker" style={{ height: "1px" }}></div>
+                    {loading && <div className="insta-loading-message">댓글 불러오는 중...</div>}
+                    {!hasMore && <div className="insta-end-of-list-message">--- 모든 댓글을 불러왔습니다 ---</div>}
                 </div>
 
                 <div className="insta-comment-input-area">
-                    <ProfilePlaceholder size={24} />
-                    <input
-                        type="text"
-                        placeholder="댓글 달기..."
-                        className="insta-comment-input"
-                        value={newComment}
-                        onChange={onChangeNewComment}
-                        onKeyDown={onKeyDownNewCommentInput}
+                    <input 
+                        className="insta-comment-input" 
+                        value={newComment} 
+                        onChange={(e) => setNewComment(e.target.value)} 
+                        placeholder="댓글 달기..." 
+                        onKeyDown={(e) => e.key === 'Enter' && onClickNewCommentBtn()}
                     />
-                    <button 
-                        className="insta-post-button" 
-                        disabled={newComment.length === 0}
-                        onClick={onClickNewCommentBtn}
-                    >
-                        게시
-                    </button>
+                    <button className="insta-post-button" onClick={onClickNewCommentBtn} disabled={!newComment.trim()}>게시</button>
                 </div>
             </div>
         </div>

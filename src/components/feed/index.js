@@ -5,7 +5,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-
+import user_logo from '../../assets/user.png';
 import "./style.css";
 import useCookie from 'react-use-cookie';
 import CommentList from "./comment-list";
@@ -28,7 +28,6 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
     const apiUrl = process.env.REACT_APP_API_URL;
     const navigate = useNavigate();
 
-    // 서버 데이터를 프론트엔드 UI 구조로 변환하는 함수
     const transformPostData = (data) => {
         if (!data) return EMPTY_POST_DATA;
         
@@ -56,7 +55,6 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
         };
     };
 
-    // 초기 데이터 존재 여부에 따라 상태 설정
     const [postData, setPostData] = useState(
         initialPostData ? transformPostData(initialPostData) : EMPTY_POST_DATA
     );
@@ -135,14 +133,12 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
     
     const onClickCommentListBtn = () => setIsCommentModalOpen(true);
 
-    useEffect(() => {
-        // 이미 데이터가 충분히 있는 경우(FeedList 등에서 전달됨) API 호출 스킵
+    useEffect(() => {   
         if (initialPostData && postData.postId) {
             setLoading(false);
             return;
         }
 
-        // postId만 있는 경우(상세 페이지 등) API 호출
         const getPostDetailsInfo = async () => {
             if (!postId) return;
             setLoading(true);
@@ -186,7 +182,7 @@ export default function Feed({ postId, initialPostData, onUpdatePost }) {
                 <div className="user-info-container">
                     {/* 작성자의 프로필 이미지 사용 */}
                     <img 
-                        src={postData.profileImage} 
+                        src={postData.profileImage == null ? user_logo : postData.profileImage} 
                         alt="프로필" 
                         className="avatar" 
                         onError={(e) => { e.target.src = "/default-profile.png"; }}
