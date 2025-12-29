@@ -141,7 +141,7 @@ export default function NotificationPanel({ setShowNotification }) {
                                 >
                                     <img src={noti.post.profileImage} alt="프로필" />
                                     <div className="notification-text">
-                                        <span className="bold">{noti.post.userId}</span>님의 댓글 \"{noti.post.comment}\"
+                                        <span className="bold">{noti.post.userId}</span>님의 댓글 "{noti.post.content}"
                                         <div className="notification-time">{formatDate(noti.post.createAt)}</div>
                                     </div>
                                 </div>

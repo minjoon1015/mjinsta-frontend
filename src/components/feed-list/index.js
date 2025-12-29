@@ -42,7 +42,6 @@ export default function FeedList({ profileImage }) {
             });
 
             const data = await response.json();
-            console.log(data);
 
             if (data.code === "SC") {
                 const newFeeds = data.feed || [];
