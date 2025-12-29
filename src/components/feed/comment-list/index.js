@@ -35,6 +35,7 @@ export default function CommentList({ postId, onClose, apiUrl, cookies, onCommen
                 headers: { Authorization: `Bearer ${cookies}` }
             });
             const data = await response.json();
+            console.log("top" + data);
             if (data.code === "SC") {
                 setTopComments((data.list || []).map(getCommentDto));
             }
@@ -59,6 +60,7 @@ export default function CommentList({ postId, onClose, apiUrl, cookies, onCommen
                 headers: { Authorization: `Bearer ${cookies}` }
             });
             const data = await response.json();
+            console.log("일반" + data);
 
             if (data.code === "SC" && data.list) {
                 const fetched = data.list.map(getCommentDto);
