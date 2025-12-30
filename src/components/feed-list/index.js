@@ -2,6 +2,96 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import Feed from "../feed";
 import useCookie from 'react-use-cookie';
 
+/**
+ * 게시글 조회 시간을 백엔드로 전송합니다.
+ */
+const sendViewHistory = async (apiUrl, token, postId, viewedAt, timeSpentSeconds) => {
+    try {
+        const response = await fetch(`${apiUrl}/api/post/view_history`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                postId: postId,
+                viewedAt: viewedAt,
+                timeSpentSeconds: timeSpentSeconds,
+            }),
+        });
+        
+    } catch (err) {
+        console.error(`[View History] 전송 중 오류 발생:`, err);
+    }
+};
+
+/**
+ * 개별 피드 아이템의 노출 시간을 측정하는 래퍼 컴포넌트
+ */
+const FeedItem = ({ post, profileImage, onUpdatePost, apiUrl, token, isLast, lastFeedRef }) => {
+    const startTimeRef = useRef(null);
+    const viewedAtRef = useRef(null);
+    const itemRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    // 화면에 피드가 나타난 시점 기록
+                    startTimeRef.current = Date.now();
+                    viewedAtRef.current = new Date().toISOString();
+                } else {
+                    // 화면에서 사라질 때 시간 계산 및 서버 전송
+                    if (startTimeRef.current && viewedAtRef.current) {
+                        const durationMs = Date.now() - startTimeRef.current;
+                        const durationSeconds = Math.floor(durationMs / 1000);
+
+                        if (durationSeconds >= 1) {
+                            sendViewHistory(apiUrl, token, post.postId, viewedAtRef.current, durationSeconds);
+                        }
+                        // 초기화
+                        startTimeRef.current = null;
+                        viewedAtRef.current = null;
+                    }
+                }
+            },
+            { threshold: 0.5 } // 피드 면적의 50%가 보일 때 기준으로 측정
+        );
+
+        if (itemRef.current) {
+            observer.observe(itemRef.current);
+        }
+
+        return () => {
+            // 컴포넌트 언마운트 시(페이지 이동 등) 마지막 측정 중이던 데이터 전송
+            if (startTimeRef.current && viewedAtRef.current) {
+                const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
+                if (durationSeconds >= 1) {
+                    sendViewHistory(apiUrl, token, post.postId, viewedAtRef.current, durationSeconds);
+                }
+            }
+            if (observer) observer.disconnect();
+        };
+    }, [post.postId, apiUrl, token]);
+
+    // 마지막 요소인 경우 무한 스크롤 Ref와 가시성 측정 Ref 동시 연결
+    const setRef = (node) => {
+        itemRef.current = node;
+        if (isLast) lastFeedRef(node);
+    };
+
+    return (
+        <div ref={setRef}>
+            <Feed 
+                postId={post.postId} 
+                initialPostData={post} 
+                profileImage={profileImage}
+                onUpdatePost={onUpdatePost}
+            />
+        </div>
+    );
+};
+
 export default function FeedList({ profileImage }) {
     const [token] = useCookie('token');
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -19,14 +109,11 @@ export default function FeedList({ profileImage }) {
 
     // API 호출 함수
     const fetchFeed = useCallback(async () => {
-        // 이미 로딩 중이거나 더 이상 데이터가 없으면 중단
         if (loading || !hasMore) return;
 
         setLoading(true);
         try {
             const params = new URLSearchParams();
-            
-            // 1. 현재 상태에 따른 파라미터 구성 (null 체크 강화)
             if (page !== null) params.append("pages", page);
             if (lastPostId !== null) params.append("postId", lastPostId);
             if (lastFavoriteCount !== null) params.append("favoriteCount", lastFavoriteCount);
@@ -48,25 +135,19 @@ export default function FeedList({ profileImage }) {
                 
                 if (newFeeds.length === 0) {
                     setHasMore(false);
-
                 } else {
-                    // 기존 포스트에 새로 가져온 포스트 추가
                     setPosts(prev => [...prev, ...newFeeds]);
 
-                    // 2. 서버 응답 데이터로 다음 요청 준비 (핵심 로직)
                     if (data.pointer !== undefined && data.pointer !== null) {
-                        // Redis 구간: 다음 페이지 번호 세팅
                         setPage(data.pointer + 1);
                         setLastPostId(null);
                         setLastFavoriteCount(null);
                     } else {
-                        // DB 구간: 인덱스 페이징 종료 및 커서 세팅
                         setPage(null);
                         setLastPostId(data.lastPostId);
                         setLastFavoriteCount(data.lastFavoriteCount);
                     }
                     
-                    // 한 페이지(30개)보다 적게 왔다면 마지막 페이지임
                     if (newFeeds.length < 30) {
                         setHasMore(false);
                     }
@@ -87,43 +168,40 @@ export default function FeedList({ profileImage }) {
         if (observer.current) observer.current.disconnect();
         
         observer.current = new IntersectionObserver(entries => {
-            // 바닥에 닿았고(isIntersecting) 데이터가 더 있다면 호출
             if (entries[0].isIntersecting && hasMore) {
                 fetchFeed();
             }
         });
         
         if (node) observer.current.observe(node);
-    }, [loading, hasMore, fetchFeed]); // fetchFeed를 의존성에 추가
+    }, [loading, hasMore, fetchFeed]);
 
     // 최초 렌더링 시 첫 페이지 로드
     useEffect(() => {
-        // posts가 비어있을 때만 최초 호출
         if (posts.length === 0) {
             fetchFeed();
         }
-    }, []); // 최초 1회 실행
+    }, [fetchFeed, posts.length]);
 
     const handleUpdatePost = (updatedData) => {
         setPosts(prev => prev.map(post => 
-            post.postId=== updatedData.postId ? { ...post, ...updatedData } : post
+            post.postId === updatedData.postId ? { ...post, ...updatedData } : post
         )); 
     };
 
     return (
         <div className="feed-list">
             {posts.map((post, index) => (
-                <div 
-                    key={`${post.postId}-${index}`} 
-                    ref={posts.length === index + 1 ? lastFeedElementRef : null}
-                >
-                    <Feed 
-                        postId={post.postId} 
-                        initialPostData={post} 
-                        profileImage={profileImage}
-                        onUpdatePost={handleUpdatePost}
-                    />
-                </div>
+                <FeedItem
+                    key={`${post.postId}-${index}`}
+                    post={post}
+                    profileImage={profileImage}
+                    onUpdatePost={handleUpdatePost}
+                    apiUrl={apiUrl}
+                    token={token}
+                    isLast={posts.length === index + 1}
+                    lastFeedRef={lastFeedElementRef}
+                />
             ))}
 
             {loading && (
