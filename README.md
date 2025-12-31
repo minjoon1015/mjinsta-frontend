@@ -8,6 +8,8 @@
 ## Project URL
 - **URL**: https://mjinsta.pe.kr/
 - **Backend Repository**: https://github.com/minjoon1015/mjinsta-backend
+- **testId : guest1234**
+- **testPw : guest1234**
 
 ---
 
